@@ -11,8 +11,7 @@ RUN wget https://github.com/router-for-me/CLIProxyAPI/releases/download/v7.3.15/
     && tar -zxvf CLIProxyAPI_7.3.15_linux_amd64.tar.gz \
     && chmod +x cli-proxy-api
 
-
-COPY config.yaml /app/config.yaml
+COPY deploy.config.yaml /app/config.yaml
 
 EXPOSE 8317
 
