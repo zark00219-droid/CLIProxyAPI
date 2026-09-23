@@ -1,37 +1,17 @@
-FROM golang:1.26-bookworm AS builder
-
+使用 Ubuntu 基礎映像檔
+FROM ubuntu:22.04
+安裝 wget、tar 等下載工具
+RUN apt-get update && apt-get install -y 
+wget 
+ca-certificates 
+&& rm -rf /var/lib/apt/lists/*
+工作目錄
 WORKDIR /app
-
-RUN apt-get update && apt-get install -y --no-install-recommends build-essential git && rm -rf /var/lib/apt/lists/*
-
-COPY go.mod go.sum ./
-
-RUN go mod download
-
-COPY . .
-
-ARG VERSION=dev
-ARG COMMIT=none
-ARG BUILD_DATE=unknown
-
-RUN CGO_ENABLED=1 GOOS=linux go build -buildvcs=false -ldflags="-s -w -X 'main.Version=${VERSION}' -X 'main.Commit=${COMMIT}' -X 'main.BuildDate=${BUILD_DATE}'" -o ./CLIProxyAPI ./cmd/server/
-
-FROM debian:bookworm
-
-RUN apt-get update && apt-get install -y --no-install-recommends tzdata ca-certificates && rm -rf /var/lib/apt/lists/*
-
-RUN mkdir /CLIProxyAPI
-
-COPY --from=builder ./app/CLIProxyAPI /CLIProxyAPI/CLIProxyAPI
-
-COPY config.example.yaml /CLIProxyAPI/config.example.yaml
-
-WORKDIR /CLIProxyAPI
-
-EXPOSE 8317
-
-ENV TZ=Asia/Shanghai
-
-RUN cp /usr/share/zoneinfo/${TZ} /etc/localtime && echo "${TZ}" > /etc/timezone
-
-CMD ["./CLIProxyAPI"]
+[關鍵] 讓 Render 在每次啟動時，自動從 GitHub Release 下載對應版本的 Linux 執行檔
+RUN wget https://github.com/router-for-me/CLIProxyAPI/releases/download/v7.3.15/CLIProxyAPI_7.3.15_linux_amd64.tar.gz 
+&& tar -zxvf CLIProxyAPI_7.3.15_linux_amd64.tar.gz 
+&& chmod +x cliproxyapi
+暴露對外連接埠
+EXPOSE 7860
+啟動服務（請根據您實際解壓縮出來的執行檔名稱調整，通常為 cliproxyapi 或 cli-proxy-api）
+CMD ["./cliproxyapi", "--port", "7860"]
