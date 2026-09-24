@@ -112,7 +112,7 @@ discovery:
 # Plugin list Management API reads Logo and ConfigFields from plugin metadata for management UI display.
 # Per-plugin enabled only controls plugins.configs.<pluginID>.enabled and does not implicitly change global plugins.enabled.
 plugins:
-  enabled: false
+  enabled: true
   dir: "plugins"
   # Additional plugin store registries. The built-in official registry is always included.
   # store-sources:
